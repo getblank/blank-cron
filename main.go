@@ -110,7 +110,7 @@ func connectToTaskQ() {
 			continue
 		}
 		client.SetSessionCloseCallback(func(c *wango.Conn) {
-			log.Warn("Sisconnect")
+			log.Warn("Disconnected from TaskQ")
 			tqLocker.Lock()
 			tqClient = nil
 			tqLocker.Unlock()
