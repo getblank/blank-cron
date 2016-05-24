@@ -30,10 +30,14 @@ func updateScheduler(storeName string, tasks []task) {
 	for i := range tasks {
 		t := tasks[i]
 		t.index = i
-		c.AddFunc(t.Schedule, func() {
+		err := c.AddFunc(t.Schedule, func() {
 			runTask(storeName, t.index)
 		})
-		log.WithFields(log.Fields{"store": storeName, "taskIndex": i, "schedule": t.Schedule}).Debug("Scheduled task")
+		if err != nil {
+			log.WithFields(log.Fields{"store": storeName, "taskIndex": i, "schedule": t.Schedule, "error":err}).Error("Can't add sheduled task")
+			continue
+		}
+		log.WithFields(log.Fields{"store": storeName, "taskIndex": i, "schedule": t.Schedule}).Debug("Scheduled task added to cron")
 	}
 	c.Start()
 	storeSchedulers[storeName] = c
@@ -48,5 +52,5 @@ func runTask(storeName string, index int) {
 		return
 	}
 	res, err := client.Call(uriRun, storeName, index)
-	log.WithFields(log.Fields{"res": res, "err": err, "store": storeName, "index": index}).Debug("Running scheduled task result")
+	log.WithFields(log.Fields{"res": res, "error": err, "store": storeName, "index": index}).Debug("Running scheduled task result")
 }

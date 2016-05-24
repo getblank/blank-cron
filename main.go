@@ -148,13 +148,13 @@ func configUpdateHandler(_ string, _event interface{}) {
 		}
 		encoded, err := json.Marshal(tasksInterface)
 		if err != nil {
-			log.WithFields(log.Fields{"err": err, "store": storeName}).Error("Can't marshal tasks")
+			log.WithFields(log.Fields{"error": err, "store": storeName}).Error("Can't marshal tasks")
 			continue
 		}
 		var tasks []task
 		err = json.Unmarshal(encoded, &tasks)
 		if err != nil {
-			log.WithFields(log.Fields{"err": err, "store": storeName}).Error("Can't unmarshal tasks")
+			log.WithFields(log.Fields{"error": err, "store": storeName}).Error("Can't unmarshal tasks")
 			continue
 		}
 		updateScheduler(storeName, tasks)
@@ -164,13 +164,13 @@ func configUpdateHandler(_ string, _event interface{}) {
 func registryUpdateHandler(_ string, _event interface{}) {
 	encoded, err := json.Marshal(_event)
 	if err != nil {
-		log.WithField("err", err).Error("Can't marshal registry update event")
+		log.WithField("error", err).Error("Can't marshal registry update event")
 		return
 	}
 	var services map[string][]service
 	err = json.Unmarshal(encoded, &services)
 	if err != nil {
-		log.WithField("err", err).Error("Can't unmarshal registry update event to []Services")
+		log.WithField("error", err).Error("Can't unmarshal registry update event to []Services")
 		return
 	}
 	tqServices, ok := services["taskQueue"]
