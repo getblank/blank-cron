@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	srAddress string
+	srAddress *string
 	tqAddress string
 	srClient  *wango.Wango
 	srLocker  sync.RWMutex
@@ -43,7 +43,7 @@ func main() {
 			connectToSr()
 		},
 	}
-	srAddress = *(rootCmd.PersistentFlags().StringP("service-registry", "s", "ws://localhost:1234", "Service registry uri"))
+	srAddress = rootCmd.PersistentFlags().StringP("service-registry", "s", "ws://localhost:1234", "Service registry uri")
 
 	if err := rootCmd.Execute(); err != nil {
 		println(err.Error())
@@ -53,7 +53,7 @@ func main() {
 }
 
 func connectedToSR(w *wango.Wango) {
-	log.Info("Connected to SR: ", srAddress)
+	log.Info("Connected to SR: ", *srAddress)
 	srLocker.Lock()
 	srClient = w
 	srLocker.Unlock()
@@ -66,8 +66,8 @@ func connectedToSR(w *wango.Wango) {
 func connectToSr() {
 	var reconnectChan = make(chan struct{})
 	for {
-		log.Info("Attempt to connect to SR: ", srAddress)
-		client, err := wango.Connect(srAddress, "http://getblank.net")
+		log.Info("Attempt to connect to SR: ", *srAddress)
+		client, err := wango.Connect(*srAddress, "http://getblank.net")
 		if err != nil {
 			log.Warn("Can'c connect to service registry: " + err.Error())
 			time.Sleep(time.Second)
