@@ -34,7 +34,7 @@ func updateScheduler(storeName string, tasks []task) {
 			runTask(storeName, t.index)
 		})
 		if err != nil {
-			log.WithFields(log.Fields{"store": storeName, "taskIndex": i, "schedule": t.Schedule, "error":err}).Error("Can't add sheduled task")
+			log.WithFields(log.Fields{"store": storeName, "taskIndex": i, "schedule": t.Schedule, "error": err}).Error("Can't add sheduled task")
 			continue
 		}
 		log.WithFields(log.Fields{"store": storeName, "taskIndex": i, "schedule": t.Schedule}).Debug("Scheduled task added to cron")
