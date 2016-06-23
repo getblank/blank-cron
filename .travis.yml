@@ -10,8 +10,9 @@ install:
   - go get github.com/spf13/cobra
 script: go get -t -v ./...
 after_success:
-  - curl --ftp-create-dirs --data-binary -k -T $HOME/gopath/bin/blank-cron -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/$(date +%Y-%m-%d_%H:%M)-$TRAVIS_OS_NAME/blank-cron
-  - curl --ftp-create-dirs --data-binary -k -T $HOME/gopath/bin/blank-cron -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/$TRAVIS_OS_NAME/blank-cron
-  - GOOS=darwin GOARCH=amd64 go build
+  - go build -ldflags "-X main.buildTime=`date +%Y-%m-%d:%H:%M:%S` -X main.gitHash=`git rev-parse --short HEAD`"
+  - curl --ftp-create-dirs --data-binary -k -T ./blank-cron -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/$(date +%Y-%m-%d_%H:%M)-linux/blank-cron
+  - curl --ftp-create-dirs --data-binary -k -T ./blank-cron -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/linux/blank-cron
+  - GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.buildTime=`date +%Y-%m-%d:%H:%M:%S` -X main.gitHash=`git rev-parse --short HEAD`"
   - curl --ftp-create-dirs --data-binary -k -T ./blank-cron -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/$(date +%Y-%m-%d_%H:%M)-osx/blank-cron
-  - curl --ftp-create-dirs --data-binary -k -T ./blank-cron -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/osx/blank-cron 
+  - curl --ftp-create-dirs --data-binary -k -T ./blank-cron -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/osx/blank-cron
