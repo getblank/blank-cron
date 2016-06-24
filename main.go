@@ -15,7 +15,7 @@ import (
 var (
 	buildTime string
 	gitHash   string
-	version   = "0.0.10"
+	version   = "0.0.11"
 )
 
 var (
@@ -68,9 +68,7 @@ func main() {
 }
 
 func printVersion() {
-	fmt.Printf("Build time:  		%s\n", buildTime)
-	fmt.Printf("Commit hash: 		%s\n", gitHash)
-	fmt.Printf("Version:     		%s\n", version)
+	fmt.Printf("blank-cron: \tv%s \t build time: %s \t commit hash: %s \n", version, buildTime, gitHash)
 }
 
 func connectedToSR(w *wango.Wango) {
