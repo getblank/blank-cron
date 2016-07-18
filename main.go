@@ -15,7 +15,7 @@ import (
 var (
 	buildTime string
 	gitHash   string
-	version   = "0.0.12"
+	version   = "0.0.13"
 )
 
 var (
