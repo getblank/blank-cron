@@ -10,6 +10,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/getblank/wango"
 	"github.com/spf13/cobra"
+	"gopkg.in/gemnasium/logrus-graylog-hook.v1"
 )
 
 var (
@@ -41,6 +42,24 @@ type task struct {
 func main() {
 	if os.Getenv("BLANK_DEBUG") != "" {
 		log.SetLevel(log.DebugLevel)
+	}
+	log.SetFormatter(&log.JSONFormatter{})
+	if os.Getenv("GRAYLOG2_HOST") != "" {
+		host := os.Getenv("GRAYLOG2_HOST")
+		port := os.Getenv("GRAYLOG2_PORT")
+		if port == "" {
+			port = "12201"
+		}
+		source := os.Getenv("GRAYLOG2_SOURCE")
+		if source == "" {
+			source = "blank-cron"
+		}
+		facility := os.Getenv("GRAYLOG2_FACILITY")
+		if facility == "" {
+			facility = "BLANK"
+		}
+		hook := graylog.NewGraylogHook(host+":"+port, facility, map[string]interface{}{"source": source})
+		log.AddHook(hook)
 	}
 	var verFlag *bool
 	rootCmd := &cobra.Command{
