@@ -58,7 +58,7 @@ func main() {
 		if facility == "" {
 			facility = "BLANK"
 		}
-		hook := graylog.NewGraylogHook(host+":"+port, facility, map[string]interface{}{"source": source})
+		hook := graylog.NewGraylogHook(host+":"+port, facility, map[string]interface{}{"source-app": source})
 		log.AddHook(hook)
 	}
 	var verFlag *bool
