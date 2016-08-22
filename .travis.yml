@@ -2,7 +2,7 @@ language: go
 os:
   - linux
 go:
-  - 1.6.3
+  - 1.7
 install:
   - sudo apt-get install -qq upx
   - go get github.com/robfig/cron
@@ -17,6 +17,6 @@ after_success:
   - curl --ftp-create-dirs --data-binary -k -T ./blank-cron -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/linux/blank-cron
 
   - GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.buildTime=`date +%Y-%m-%d:%H:%M:%S` -X main.gitHash=`git rev-parse --short HEAD`"
-  - upx --best blank-cron
+  # - upx --best blank-cron
   - curl --ftp-create-dirs --data-binary -k -T ./blank-cron -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/$(date +%Y-%m-%d_%H:%M)-osx/blank-cron
   - curl --ftp-create-dirs --data-binary -k -T ./blank-cron -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/osx/blank-cron
