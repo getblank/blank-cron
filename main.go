@@ -10,7 +10,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/getblank/wango"
 	"github.com/spf13/cobra"
-	"gopkg.in/gemnasium/logrus-graylog-hook.v1"
+	"gopkg.in/gemnasium/logrus-graylog-hook.v2"
 )
 
 var (
@@ -54,11 +54,7 @@ func main() {
 		if source == "" {
 			source = "blank-cron"
 		}
-		facility := os.Getenv("GRAYLOG2_FACILITY")
-		if facility == "" {
-			facility = "BLANK"
-		}
-		hook := graylog.NewGraylogHook(host+":"+port, facility, map[string]interface{}{"source-app": source})
+		hook := graylog.NewGraylogHook(host+":"+port, map[string]interface{}{"source-app": source})
 		log.AddHook(hook)
 	}
 	var verFlag *bool
