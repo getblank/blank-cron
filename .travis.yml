@@ -2,7 +2,7 @@ language: go
 os:
   - linux
 go:
-  - 1.7
+  - 1.7.3
 install:
   - sudo apt-get install -qq upx
   - go get github.com/robfig/cron
@@ -11,12 +11,25 @@ install:
   - go get github.com/spf13/cobra
 script: go get -t -v ./...
 after_success:
-  - go build -ldflags "-X main.buildTime=`date +%Y-%m-%d:%H:%M:%S` -X main.gitHash=`git rev-parse --short HEAD`"
-  - upx --best blank-cron
-  - curl --ftp-create-dirs --data-binary -k -T ./blank-cron -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/$(date +%Y-%m-%d_%H:%M)-linux/blank-cron
-  - curl --ftp-create-dirs --data-binary -k -T ./blank-cron -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/linux/blank-cron
+  - go build -o blank-cron-linux-amd64 -ldflags "-X main.buildTime=`date +%Y-%m-%d:%H:%M:%S` -X main.gitHash=`git rev-parse --short HEAD`"
+  - upx --best blank-cron-linux-amd64
+  - curl --ftp-create-dirs --data-binary -k -T ./blank-cron-linux-amd64 -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/linux/blank-cron
+  - if [[ ${TRAVIS_TAG} ]]; then
+      curl --ftp-create-dirs --data-binary -k -T ./blank-cron-linux-amd64 -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/${TRAVIS_TAG}/blank-cron-linux-amd64;
+    fi
 
-  - GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.buildTime=`date +%Y-%m-%d:%H:%M:%S` -X main.gitHash=`git rev-parse --short HEAD`"
-  # - upx --best blank-cron
-  - curl --ftp-create-dirs --data-binary -k -T ./blank-cron -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/$(date +%Y-%m-%d_%H:%M)-osx/blank-cron
-  - curl --ftp-create-dirs --data-binary -k -T ./blank-cron -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/osx/blank-cron
+  - GOOS=darwin GOARCH=amd64 go build -o blank-cron-darwin-amd64 -ldflags "-X main.buildTime=`date +%Y-%m-%d:%H:%M:%S` -X main.gitHash=`git rev-parse --short HEAD`"
+  - curl --ftp-create-dirs --data-binary -k -T ./blank-cron-darwin-amd64 -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/osx/blank-cron
+  - if [[ ${TRAVIS_TAG} ]]; then
+      curl --ftp-create-dirs --data-binary -k -T ./blank-cron-darwin-amd64 -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/${TRAVIS_TAG}/blank-cron-darwin-amd64;
+    fi
+
+deploy:
+  provider: releases
+  api_key: "$GITHUB_OAUTH_TOKEN"
+  file:
+    - blank-cron-linux-amd64
+    - blank-cron-darwin-amd64
+  skip_cleanup: true
+  on:
+    tags: true
