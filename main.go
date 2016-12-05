@@ -36,6 +36,7 @@ type service struct {
 
 type task struct {
 	Schedule string `json:"schedule"`
+	AllowConcurrent bool `json:"allowConcurrent"`
 	index    int
 }
 
