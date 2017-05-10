@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"os"
 	"sync"
@@ -9,7 +10,6 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/getblank/wango"
-	"github.com/spf13/cobra"
 	"gopkg.in/gemnasium/logrus-graylog-hook.v2"
 )
 
@@ -35,9 +35,9 @@ type service struct {
 }
 
 type task struct {
-	Schedule string `json:"schedule"`
-	AllowConcurrent bool `json:"allowConcurrent"`
-	index    int
+	Schedule        string `json:"schedule"`
+	AllowConcurrent bool   `json:"allowConcurrent"`
+	index           int
 }
 
 func main() {
@@ -58,29 +58,19 @@ func main() {
 		hook := graylog.NewGraylogHook(host+":"+port, map[string]interface{}{"source-app": source})
 		log.AddHook(hook)
 	}
-	var verFlag *bool
-	rootCmd := &cobra.Command{
-		Use:   "router",
-		Short: "Router for Blank platform",
-		Long:  "The next generation of web applications. This is the router subsytem.",
-		Run: func(cmd *cobra.Command, args []string) {
-			if *verFlag {
-				printVersion()
-				return
-			}
-			log.Info("Router started")
-			go connectToTaskQ()
-			connectToSr()
-		},
-	}
-	srAddress = rootCmd.PersistentFlags().StringP("service-registry", "s", "ws://localhost:1234", "Service registry uri")
-	verFlag = rootCmd.PersistentFlags().BoolP("version", "v", false, "Prints version and exit")
 
-	if err := rootCmd.Execute(); err != nil {
-		println(err.Error())
-		os.Exit(-1)
+	srAddress = flag.String("s", "ws://localhost:1234", "Service registry uri")
+	verFlag := flag.Bool("v", false, "Prints version and exit")
+	flag.Parse()
+
+	if *verFlag {
+		printVersion()
+		return
 	}
 
+	log.Info("Router started")
+	go connectToTaskQ()
+	connectToSr()
 }
 
 func printVersion() {
