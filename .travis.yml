@@ -2,9 +2,8 @@ language: go
 os:
   - linux
 go:
-  - 1.7.3
+  - 1.8.1
 install:
-  - sudo apt-get install -qq upx
   - go get github.com/robfig/cron
   - go get github.com/Sirupsen/logrus
   - go get github.com/getblank/wango
@@ -12,17 +11,8 @@ install:
 script: go get -t -v ./...
 after_success:
   - go build -o blank-cron-linux-amd64 -ldflags "-X main.buildTime=`date +%Y-%m-%d:%H:%M:%S` -X main.gitHash=`git rev-parse --short HEAD`"
-  - upx --best blank-cron-linux-amd64
-  - curl --ftp-create-dirs --data-binary -k -T ./blank-cron-linux-amd64 -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/linux/blank-cron
-  - if [[ ${TRAVIS_TAG} ]]; then
-      curl --ftp-create-dirs --data-binary -k -T ./blank-cron-linux-amd64 -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/${TRAVIS_TAG}/blank-cron-linux-amd64;
-    fi
-
   - GOOS=darwin GOARCH=amd64 go build -o blank-cron-darwin-amd64 -ldflags "-X main.buildTime=`date +%Y-%m-%d:%H:%M:%S` -X main.gitHash=`git rev-parse --short HEAD`"
-  - curl --ftp-create-dirs --data-binary -k -T ./blank-cron-darwin-amd64 -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/osx/blank-cron
-  - if [[ ${TRAVIS_TAG} ]]; then
-      curl --ftp-create-dirs --data-binary -k -T ./blank-cron-darwin-amd64 -u $FTP_USER:$FTP_PASSWORD ftp://releases.getblank.net/releases/blank-cron/${TRAVIS_TAG}/blank-cron-darwin-amd64;
-    fi
+  - GOOS=windows GOARCH=amd64 go build -o blank-cron-win32-amd64.exe -ldflags "-X main.buildTime=`date +%Y-%m-%d:%H:%M:%S` -X main.gitHash=`git rev-parse --short HEAD`"
 
 deploy:
   provider: releases
@@ -30,6 +20,7 @@ deploy:
   file:
     - blank-cron-linux-amd64
     - blank-cron-darwin-amd64
+    - blank-cron-win32-amd64.exe
   skip_cleanup: true
   on:
     tags: true
