@@ -99,6 +99,7 @@ func connectToSr() {
 			continue
 		}
 		client.SetSessionCloseCallback(func(c *wango.Conn) {
+			log.Warn("Disconnected from service registry")
 			srLocker.Lock()
 			srClient = nil
 			srLocker.Unlock()
@@ -125,6 +126,8 @@ func connectToTaskQ() {
 			break
 		}
 	}
+
+	log.Warn("Got TaskQ address!")
 	var reconnectChan = make(chan struct{})
 	for {
 		log.Info("Attempt to connect to TaskQ: ", tqAddress)
@@ -187,6 +190,7 @@ func configUpdateHandler(_ string, _event interface{}) {
 }
 
 func registryUpdateHandler(_ string, _event interface{}) {
+	log.Debug("Registry received")
 	encoded, err := json.Marshal(_event)
 	if err != nil {
 		log.WithField("error", err).Error("Can't marshal registry update event")
@@ -212,8 +216,11 @@ func registryUpdateHandler(_ string, _event interface{}) {
 	}
 	if _tqAddress != "" {
 		tqLocker.Lock()
+		prevAddress := tqAddress
 		tqAddress = _tqAddress
 		tqLocker.Unlock()
-		reconnectToTaskQ()
+		if prevAddress != tqAddress {
+			reconnectToTaskQ()
+		}
 	}
 }
