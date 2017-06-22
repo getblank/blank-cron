@@ -4,9 +4,6 @@ os:
 go:
   - 1.8.1
 install:
-  - go get github.com/robfig/cron
-  - go get github.com/Sirupsen/logrus
-  - go get github.com/getblank/wango
 script: go get -t -v ./...
 after_success:
   - go build -o blank-cron-linux-amd64 -ldflags "-X main.buildTime=`date +%Y-%m-%d:%H:%M:%S` -X main.gitHash=`git rev-parse --short HEAD`"
