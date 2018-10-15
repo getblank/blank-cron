@@ -2,15 +2,15 @@ package wango
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
 )
 
 func parseMessage(_msg []byte) (int, []interface{}, error) {
 	var msg []interface{}
 	err := json.Unmarshal(_msg, &msg)
 	if err != nil {
-		return 0, nil, errors.Wrap(err, "when unmarshaling wamp message")
+		return 0, nil, err
 	}
 	if len(msg) < 1 {
 		return 0, nil, errors.New("invalid wamp message")
@@ -21,7 +21,7 @@ func parseMessage(_msg []byte) (int, []interface{}, error) {
 	if strCallType, ok := msg[0].(string); ok {
 		callType, ok := msgTxtTypes[strCallType]
 		if !ok {
-			return 0, nil, errors.Errorf("unknown call type: %s", strCallType)
+			return 0, nil, fmt.Errorf("unknown call type: %s", strCallType)
 		}
 		return callType, msg, nil
 	}
@@ -31,9 +31,12 @@ func parseMessage(_msg []byte) (int, []interface{}, error) {
 func parseWampMessage(typ int, msg []interface{}) (*wampMsg, error) {
 	if typ == msgCall && len(msg) < 3 {
 		return nil, errors.New("invalid wamp message")
-	} else if len(msg) < 2 {
+	}
+
+	if len(msg) < 2 {
 		return nil, errors.New("invalid wamp message")
 	}
+
 	message := new(wampMsg)
 	switch typ {
 	case msgCall:

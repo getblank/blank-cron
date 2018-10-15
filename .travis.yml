@@ -2,8 +2,8 @@ language: go
 os:
   - linux
 go:
-  - 1.8.1
-install:
+  - "1.11"
+install
 script: go get -t -v ./...
 after_success:
   - go build -o blank-cron-linux-amd64 -ldflags "-X main.buildTime=`date +%Y-%m-%d:%H:%M:%S` -X main.gitHash=`git rev-parse --short HEAD`"
